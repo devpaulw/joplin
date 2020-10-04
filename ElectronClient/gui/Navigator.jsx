@@ -9,7 +9,9 @@ class NavigatorComponent extends Component {
 			const screenInfo = this.props.screens[newProps.route.routeName];
 			const windowTitle = ['Joplin'];
 			if (screenInfo.title) {
+				const windowTitle = ['Joplin'];
 				windowTitle.push(screenInfo.title());
+				this.updateWindowTitle(windowTitle.join(' - '));
 			}
 			this.updateWindowTitle(windowTitle.join(' - '));
 		}

@@ -5,6 +5,7 @@ const { FoldersScreenUtils } = require('lib/folders-screen-utils.js');
 const Setting = require('lib/models/Setting.js');
 const { shim } = require('lib/shim.js');
 const MasterKey = require('lib/models/MasterKey');
+const Note = require('lib/models/Note');
 const Folder = require('lib/models/Folder');
 const { _, setLocale } = require('lib/locale.js');
 const { Logger } = require('lib/logger.js');
@@ -344,6 +345,10 @@ class Application extends BaseApplication {
 
 		if (['NOTE_DEVTOOLS_TOGGLE', 'NOTE_DEVTOOLS_SET'].indexOf(action.type) >= 0) {
 			this.toggleDevTools(newState.devToolsVisible);
+		}
+
+		if (action.type.indexOf('NOTE_SELECT') === 0 || action.type.indexOf('NOTE_UPDATE') === 0 || action.type.indexOf('FOLDER_UPDATE') === 0 || action.type === 'NAV_BACK') {
+			app().refreshTitle(newState);
 		}
 
 		if (action.type === 'FOLDER_AND_NOTE_SELECT') {
@@ -1029,6 +1034,24 @@ class Application extends BaseApplication {
 			]);
 			app.createTray(contextMenu);
 		}
+	}
+
+	async refreshTitle(state) {
+		const windowTitle = [];
+
+		windowTitle.push('Joplin');
+
+		const selectedNoteId = state.selectedNoteIds.length === 1 ? state.selectedNoteIds[0] : null;
+
+		if (selectedNoteId) {
+			const selectedNote = await Note.load(selectedNoteId);
+			const noteFolder = Folder.byId(state.folders, selectedNote.parent_id);
+
+			windowTitle.push(Folder.displayTitle(noteFolder));
+			windowTitle.push(Note.displayTitle(selectedNote));
+		}
+
+		bridge().windowSetTitle(windowTitle.join(' - '));
 	}
 
 	updateEditorFont() {

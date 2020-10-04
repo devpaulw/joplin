@@ -55,6 +55,11 @@ class Bridge {
 		return this.window().setSize(width, height);
 	}
 
+	windowSetTitle(title) {
+		if (!this.window()) return;
+		return this.window().setTitle(title);
+	}
+
 	openDevTools() {
 		return this.window().webContents.openDevTools();
 	}
